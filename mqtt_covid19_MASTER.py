@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 import time
@@ -15,10 +9,6 @@ import requests
 import copy
 import sys
 import sqlite3
-
-
-# In[ ]:
-
 
 # Get the latest covid statistics for specific country from arcgis.com via their RESP API
 # 
@@ -47,10 +37,6 @@ def getLatestCovidData(country):
         print('getCovidData: Error while accessing REST API: ', err, file=sys.stderr, flush=True)
         return err, ''
 
-
-# In[ ]:
-
-
 # Create table in SQLite DB for specific country (if not exists)
 def DBCreateTableIfNotExists(country):
     conn = None
@@ -74,10 +60,6 @@ def DBCreateTableIfNotExists(country):
     finally:
         if (conn):
             conn.close()
-
-
-# In[ ]:
-
 
 # Insert new published data into DB
 def DBInsertNewData(payload):
@@ -103,10 +85,6 @@ def DBInsertNewData(payload):
         if (conn):
             conn.close()
 
-
-# In[ ]:
-
-
 # return the last record for Country older than today (Last_Update < today)
 def DBSelectLastRecordFromYesterday(country):
     conn = None
@@ -128,9 +106,6 @@ def DBSelectLastRecordFromYesterday(country):
     finally:
         if (conn):
             conn.close()
-
-
-# In[ ]:
 
 
 # return the last record for Country older than today (Last_Update < today)
@@ -155,10 +130,7 @@ def DBSelectLastRecordFromToday(country):
         if (conn):
             conn.close()
 
-
-# In[ ]:
-
-
+            
 # Check if there is change in the received data (compared to last record from previous day)
 # If yes, create and return JSON payload with updated statistics
 def compareNewDataAndCreatePayload(data):
@@ -216,9 +188,6 @@ def compareNewDataAndCreatePayload(data):
     return payload
 
 
-# In[ ]:
-
-
 # could be imporoved by adding the on_publish callback and inserting the data to DB upon this event to be sure it was really published
 
 def publishNewData(country):
@@ -247,9 +216,6 @@ def publishNewData(country):
         print('publishNewData: Error occured while calling getLatestCovidData()', file=sys.stderr, flush=True)
 
 
-# In[ ]:
-
-
 # Initialize DB for each country
 DBCreateTableIfNotExists('Slovakia')
 DBCreateTableIfNotExists('Austria')
@@ -257,9 +223,6 @@ DBCreateTableIfNotExists('Czechia')
 DBCreateTableIfNotExists('Hungary')
 DBCreateTableIfNotExists('Poland')
 DBCreateTableIfNotExists('Ukraine')
-
-
-# In[ ]:
 
 
 def checkAndPublishForEachCountry():
@@ -270,20 +233,9 @@ def checkAndPublishForEachCountry():
     publishNewData('Poland')
     publishNewData('Ukraine')
 
-
-# In[ ]:
-
-
 #schedule.every().minute.do(SendPayload)
 schedule.every().hour.at(":00").do(checkAndPublishForEachCountry)
 
 while True:
     schedule.run_pending()
     time.sleep(60)
-
-
-# In[ ]:
-
-
-
-
